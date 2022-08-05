@@ -7,27 +7,31 @@ import java.util.Map;
  * Created by Anindita Banik on 8/5/22.
  */
 class Trienode{
-    String word = "";
-    Map<Integer, Trienode> children = new HashMap<>();
+    boolean word = false;
+    Map<Character, Trienode> children = new HashMap<>();
+    public Trienode() {}
 }
-public class WordDictionary {
+
+class WordDictionary {
 
     Trienode root;
-
     public WordDictionary() {
         root = new Trienode();
     }
 
+    /** Adds a word into the data structure. */
     public void addWord(String word) {
         Trienode node = root;
-        for(Character c: word.toCharArray()){
-            if(!node.children.containsKey(c-'a'))
-                node.children.put(c-'a', new Trienode());
-            node = node.children.get(c-'a');
+        for(char c: word.toCharArray()){
+            if(!node.children.containsKey(c))
+                node.children.put(c, new Trienode());
+            node = node.children.get(c);
         }
-        node.word = word;
+        node.word = true;
     }
 
+    /** Returns if the word is in the data structure.
+     * A word could contain the dot character '.' to represent any one letter. */
     public boolean search(String word) {
         return searchInNode(word, root);
     }
@@ -35,11 +39,13 @@ public class WordDictionary {
     /** Returns if the word is in the node. */
     public boolean searchInNode(String word, Trienode node) {
         for(int i=0;i<word.length();i++){
-            int ch = word.charAt(i)-'a';
-            if(!node.children.containsKey(ch)){
-                if(ch=='.'){
-                    for(Integer c: node.children.keySet()){
-                        Trienode child = node.children.get(c);
+            char c = word.charAt(i);
+            if(!node.children.containsKey(c)){
+                // if the current character is '.'
+                // check all possible nodes at this level
+                if(c=='.'){
+                    for(char ch:node.children.keySet()){
+                        Trienode child = node.children.get(ch);
                         if(searchInNode(word.substring(i+1), child))
                             return true;
                     }
@@ -48,22 +54,9 @@ public class WordDictionary {
                 // or the current character != '.'
                 return false;
             } else{
-                node = node.children.get(ch);
+                node = node.children.get(c);
             }
         }
-        return true;
-    }
-
-
-    public static void main(String[] args) {
-        WordDictionary dictionary = new WordDictionary();
-        dictionary.addWord("bad");
-        dictionary.addWord("dad");
-        dictionary.addWord("mad");
-
-        System.out.println("Searching pad:"+dictionary.search("pad"));
-        System.out.println("Searching bad:"+dictionary.search("bad"));
-//        System.out.println("Searching pad:"+dictionary.search(".ad"));
-//        System.out.println("Searching pad:"+dictionary.search("b.."));
+        return node.word;
     }
 }
