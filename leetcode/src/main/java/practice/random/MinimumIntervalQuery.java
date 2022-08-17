@@ -1,4 +1,4 @@
-package blind.interval;
+package practice.random;
 
 import java.util.*;
 
